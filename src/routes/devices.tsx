@@ -4,7 +4,7 @@ import Modal from '../components/Modal';
 import useRequest from '../hooks/useRequest';
 import useGet from '../hooks/useGet';
 import DeviceCard from '../components/DeviceCard';
-import { Device } from '../models/device';
+import { Device, parseDevice } from '../models/device';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
 
@@ -20,10 +20,12 @@ export default () => {
   const [deviceName, setDeviceName] = useState('');
   const [deviceType, setDeviceType] = useState<Device['type']>('light');
 
-  const { data: devices, mutate: refreshDevices } = useGet(
+  const { data: deviceData, mutate: refreshDevices } = useGet(
     '/places/' + placeId + '/rooms/' + roomId + '/devices/');
   const { data: room, mutate: refreshRoom } = useGet(
     '/places/' + placeId + '/rooms/' + roomId);
+
+  const devices = deviceData?.map((d: any) => parseDevice(d));
 
   const submit = async () => {
     const res = await post(
@@ -72,8 +74,10 @@ export default () => {
           </div>
         </p>
       </div>
-      <AutoAnimateDiv className="px-6">
+      {(placeId && roomId) && <AutoAnimateDiv className="px-6">
         {devices?.map((device: Device) => <DeviceCard
+          placeId={+placeId}
+          roomId={+roomId}
           key={device.id}
           device={device}
         />)}
@@ -85,7 +89,7 @@ export default () => {
         >
           <p className="text-center">+ 新增设备</p>
         </div>
-      </AutoAnimateDiv>
+      </AutoAnimateDiv>}
 
       <Modal
         isOpened={isCreatingDevice}

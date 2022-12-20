@@ -1,14 +1,28 @@
 import Modal from './Modal';
 import DeviceCard from './DeviceCard';
-import type { Device } from '../models/device';
+import useGet from '../hooks/useGet';
+import { parseDevice } from '../models/device';
 
 interface Props {
-  device?: Device;
   onClose: () => void;
+  placeId: number;
+  roomId: number;
+  deviceId?: number;
 }
 
 export default (props: Props) => {
-  return <Modal isOpened={!!props.device} onClose={props.onClose}>
-    {props.device && <DeviceCard device={props.device}/>}
+
+  const { data } = useGet(
+    `/places/${props.placeId}/rooms/${props.roomId}/devices/${props.deviceId}`,
+    !!props.deviceId);
+
+  const device = !!data ? parseDevice(data) : undefined;
+
+  return <Modal isOpened={!!props.deviceId} onClose={props.onClose}>
+    {device && <DeviceCard
+      device={device}
+      placeId={props.placeId}
+      roomId={props.roomId}
+    />}
   </Modal>;
 };

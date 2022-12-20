@@ -3,6 +3,7 @@ import { apiHost } from '../config';
 import useGet from '../hooks/useGet';
 import useRequest from '../hooks/useRequest';
 import DeviceModal from '../components/DeviceModal';
+import { Device, parseDevice } from '../models/device';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { TouchEvent, useEffect, useRef, useState } from 'react';
 
@@ -21,11 +22,11 @@ export default () => {
   const [devices, setDevices] = useState<any[]>([]);
   const [dragOffset, setDragOffset] = useState<{ x: number, y: number }>();
 
-  const [selectedDevice, setSelectedDevice] = useState<any>();
+  const [selectedDeviceId, setSelectedDeviceId] = useState<number>();
 
   useEffect(() => {
     if (!devicesData) return;
-    setDevices(devicesData);
+    setDevices(devicesData.map(parseDevice));
   }, [devicesData?.length]);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -104,13 +105,17 @@ export default () => {
           src={apiHost + '/images/places/' + placeId + '/rooms/' + roomId}
           className="w-full object-contain"
           alt="room"
+          onError={() => {
+            alert('户型图加载失败，请建立新房间！');
+            navigate(`/places/${placeId}/rooms`);
+          }}
         />
-        {devices?.map((device: any) => <div
+        {devices?.map((device: Device) => <div
           key={device.id}
           onTouchStart={(e) => onDragStart(e, device.id)}
           onTouchMove={(e) => onDrag(e)}
           onTouchEnd={() => onDragEnd()}
-          onClick={() => setSelectedDevice(device)}
+          onClick={() => setSelectedDeviceId(device.id)}
           className="absolute flex h-12 w-12 cursor-move
            select-none items-center justify-center rounded-full
             bg-primary/50 font-bold text-white"
@@ -123,10 +128,12 @@ export default () => {
         </div>)}
       </div>
 
-      <DeviceModal
-        device={selectedDevice}
-        onClose={() => setSelectedDevice(undefined)}
-      />
+      {(placeId && roomId) && <DeviceModal
+        placeId={+placeId}
+        roomId={+roomId}
+        deviceId={selectedDeviceId}
+        onClose={() => setSelectedDeviceId(undefined)}
+      />}
 
     </div>
   );
