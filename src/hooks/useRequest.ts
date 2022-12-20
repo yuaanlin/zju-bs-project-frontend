@@ -6,19 +6,20 @@ function useAuthedRequest() {
   const session = useSession();
 
   function getHeader() {
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    };
-    if (session.token) headers.Authorization = session.token;
+    const headers: HeadersInit = { Accept: 'application/json', };
+    if (session.token) headers.Authorization = 'Bearer ' + session.token;
     return headers;
   }
 
   function put(url: string, data: any) {
+    const formData = new FormData();
+    Object.keys(data).forEach(key => {
+      formData.append(key, data[key]);
+    });
     return fetch(apiHost + url, {
       method: 'PUT',
       headers: getHeader(),
-      body: JSON.stringify(data),
+      body: formData,
     });
   }
 
@@ -30,10 +31,14 @@ function useAuthedRequest() {
   }
 
   function post(url: string, data: any) {
+    const formData = new FormData();
+    Object.keys(data).forEach(key => {
+      formData.append(key, data[key]);
+    });
     return fetch(apiHost + url, {
       method: 'POST',
       headers: getHeader(),
-      body: JSON.stringify(data),
+      body: formData,
     });
   }
 

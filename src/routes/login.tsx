@@ -1,15 +1,26 @@
 import LoginBackground from '../assets/login-bg.png';
+import useRequest from '../hooks/useRequest';
+import { useSession } from '../hooks/useSession';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
 export default () => {
 
   const navigate = useNavigate();
+  const session = useSession();
+  const { post } = useRequest();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const submit = async () => {
+    const res = await post('/user/login', { username, password });
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.message);
+      return;
+    }
+    session.setToken(data.token);
     navigate('/places');
   };
 
@@ -30,11 +41,20 @@ export default () => {
         <p className="mb-8 text-4xl font-bold">用户登录</p>
         <div className="mb-4">
           <p>用户名</p>
-          <input className="rounded-lg border p-2"/>
+          <input
+            className="rounded-lg border p-2"
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+          />
         </div>
         <div>
           <p>密码</p>
-          <input className="rounded-lg border p-2" type="password"/>
+          <input
+            className="rounded-lg border p-2"
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+          />
         </div>
 
         <div className="mt-6 flex items-center">

@@ -7,7 +7,7 @@ function useGet<T>(url: string, condition?: boolean) {
   const session = useSession();
   const fetcher = useCallback((url: string) => {
     const headers: HeadersInit = {};
-    if (session.token) headers.Authorization = session.token;
+    if (session.token) headers.Authorization = 'Bearer ' + session.token;
     return fetch(url, { headers }).then(res => {
       if (res.status === 403) session.clearToken();
       return res.json();

@@ -1,4 +1,6 @@
 import LoginBackground from '../assets/login-bg.png';
+import useRequest from '../hooks/useRequest';
+import { useSession } from '../hooks/useSession';
 import { Link, useNavigate } from 'react-router-dom';
 import { ChangeEvent, useState } from 'react';
 
@@ -14,6 +16,8 @@ interface RegisterForm {
 export default () => {
 
   const navigate = useNavigate();
+  const { post } = useRequest();
+  const session = useSession();
 
   const [form, setForm] = useState<RegisterForm>({
     email: '',
@@ -33,6 +37,56 @@ export default () => {
     };
 
   const submit = async () => {
+
+    const usernameRegex = /^[a-zA-Z0-9]{6,}$/;
+    if (!usernameRegex.test(form.username)) {
+      alert('用户名必须至少6位，只能包含字母和数字');
+      return;
+    }
+
+    const passwordRegex = /^[a-zA-Z0-9!@#$%^&*]{6,}$/;
+    if (!passwordRegex.test(form.password)) {
+      alert('密码必须至少6位，只能包含字母、数字和符号');
+      return;
+    }
+
+    if (form.password !== form.passwordConfirm) {
+      alert('两次输入密码不一致');
+      return;
+    }
+
+    if (form.nickname.length === 0) {
+      alert('昵称不得为空');
+      return;
+    }
+
+    const phoneRegex = /^1[3456789]\d{9}$/;
+    if (!phoneRegex.test(form.phone)) {
+      alert('请输入正确的手机号');
+      return;
+    }
+
+    // eslint-disable-next-line max-len
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    if (!emailRegex.test(form.email)) {
+      alert('请输入正确的邮箱');
+      return;
+    }
+
+    const res = await post('/user/register', {
+      username: form.username,
+      password: form.password,
+      nickname: form.nickname,
+      phone: form.phone,
+      email: form.email
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.message);
+      return;
+    }
+    session.setToken(data.token);
     navigate('/places');
   };
 
@@ -70,8 +124,8 @@ export default () => {
           <p>手机号</p>
           <input
             className="rounded-lg border p-2"
-            value={form.username}
-            onChange={handleChange('username')}
+            value={form.phone}
+            onChange={handleChange('phone')}
           />
         </div>
 
@@ -79,8 +133,8 @@ export default () => {
           <p>密码</p>
           <input
             className="rounded-lg border p-2"
-            value={form.username}
-            onChange={handleChange('username')}
+            value={form.password}
+            onChange={handleChange('password')}
             type="password"/>
         </div>
 
@@ -88,8 +142,8 @@ export default () => {
           <p>确认密码</p>
           <input
             className="rounded-lg border p-2"
-            value={form.username}
-            onChange={handleChange('username')}
+            value={form.passwordConfirm}
+            onChange={handleChange('passwordConfirm')}
             type="password"/>
         </div>
 
@@ -97,8 +151,8 @@ export default () => {
           <p>昵称</p>
           <input
             className="rounded-lg border p-2"
-            value={form.username}
-            onChange={handleChange('username')}
+            value={form.nickname}
+            onChange={handleChange('nickname')}
           />
         </div>
 
@@ -106,8 +160,8 @@ export default () => {
           <p>邮箱</p>
           <input
             className="rounded-lg border p-2"
-            value={form.username}
-            onChange={handleChange('username')}
+            value={form.email}
+            onChange={handleChange('email')}
           />
         </div>
 

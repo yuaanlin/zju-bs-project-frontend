@@ -1,6 +1,7 @@
 export default () => {
   return <footer
-    className="fixed bottom-0 z-10 w-screen bg-primary p-4 text-xs text-white"
+    className="fixed bottom-0 z-10 w-screen max-w-md bg-primary p-4
+     text-xs text-white"
   >
     <div>
       <p>本网站是浙江大学计算机科学与技术学院</p>
