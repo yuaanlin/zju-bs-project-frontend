@@ -1,5 +1,6 @@
 import useRequest from '../hooks/useRequest';
 import { useRevalidate } from '../hooks/useGet';
+import { TrashIcon } from '@heroicons/react/20/solid';
 import type { Device } from '../models/device';
 
 interface Props {
@@ -9,10 +10,36 @@ interface Props {
 }
 
 export default (props: Props) => {
+
+  const { del } = useRequest();
+  const revalidate = useRevalidate();
+
+  const deleteDevice = async () => {
+    try {
+      const res = await del(
+        '/places/' + props.placeId + '/rooms/' + props.roomId + '/devices/' +
+        props.device.id);
+      if (!res.ok) {
+        alert((await res.json()).message);
+        return;
+      }
+      await revalidate(`/places/${props.placeId}/rooms/${props.roomId
+      }/devices/`);
+    } catch (e: any) {
+      console.error(e.message);
+    }
+  };
+
   return <div
     className="mb-4 flex h-32 w-full items-end rounded-lg bg-primary/10 p-4"
   >
-    <p className="mr-4 grow text-3xl font-bold">{props.device.name}</p>
+    <div className="flex h-full grow flex-col justify-between">
+      <TrashIcon
+        className="h-5 w-5 cursor-pointer text-red-600"
+        onClick={deleteDevice}
+      />
+      <p className="mr-4 text-3xl font-bold">{props.device.name}</p>
+    </div>
     <Control {...props} />
   </div>;
 };

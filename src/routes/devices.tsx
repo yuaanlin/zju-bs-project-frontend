@@ -7,6 +7,7 @@ import DeviceCard from '../components/DeviceCard';
 import { Device, parseDevice } from '../models/device';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
+import { ChevronLeftIcon } from '@heroicons/react/20/solid';
 
 export default () => {
   const session = useSession();
@@ -51,8 +52,9 @@ export default () => {
     <div className="mb-32">
 
       <div className="flex w-full justify-between">
-        <Link to={`/places/${placeId}/rooms`}>
-          <p className="p-6 font-bold text-primary">返回房间列表</p>
+        <Link to={`/places/${placeId}/rooms`} className="flex items-center p-4">
+          <ChevronLeftIcon className="h-6 w-6 text-primary"/>
+          <p className="font-bold text-primary">返回房间列表</p>
         </Link>
         <p
           className="cursor-pointer p-6 font-bold text-primary"

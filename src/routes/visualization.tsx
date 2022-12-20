@@ -6,6 +6,7 @@ import DeviceModal from '../components/DeviceModal';
 import { Device, parseDevice } from '../models/device';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { TouchEvent, useEffect, useRef, useState } from 'react';
+import { ChevronLeftIcon } from '@heroicons/react/20/solid';
 
 export default () => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export default () => {
   const { put } = useRequest();
 
   const [draggingDeviceId, setDraggingDeviceId] = useState<number>();
-  const [devices, setDevices] = useState<any[]>([]);
+  const [devices, setDevices] = useState<Device[]>([]);
   const [dragOffset, setDragOffset] = useState<{ x: number, y: number }>();
 
   const [selectedDeviceId, setSelectedDeviceId] = useState<number>();
@@ -76,8 +77,9 @@ export default () => {
     <div className="mb-32">
 
       <div className="flex w-full justify-between">
-        <Link to={`/places/${placeId}/rooms`}>
-          <p className="p-6 font-bold text-primary">返回房间列表</p>
+        <Link to={`/places/${placeId}/rooms`} className="flex items-center p-4">
+          <ChevronLeftIcon className="h-6 w-6 text-primary"/>
+          <p className="font-bold text-primary">返回房间列表</p>
         </Link>
         <p
           className="cursor-pointer p-6 font-bold text-primary"
@@ -104,7 +106,11 @@ export default () => {
         </p>
       </div>
 
-      <div className="relative w-full" ref={containerRef}>
+      <p className="px-6 text-xs text-primary">
+        提升：可视化页面仅能使用手机触屏操作
+      </p>
+
+      <div className="relative w-full overflow-hidden" ref={containerRef}>
         <img
           src={apiHost + '/images/places/' + placeId + '/rooms/' + roomId}
           className="w-full object-contain"
@@ -120,9 +126,9 @@ export default () => {
           onTouchMove={(e) => onDrag(e)}
           onTouchEnd={() => onDragEnd()}
           onClick={() => setSelectedDeviceId(device.id)}
-          className="absolute flex h-12 w-12 cursor-move
+          className="absolute flex h-16 w-16 cursor-move
            select-none items-center justify-center rounded-full
-            bg-primary/50 font-bold text-white"
+            bg-primary/50 text-xs font-bold text-white"
           style={{
             top: device.positionY,
             left: device.positionX,

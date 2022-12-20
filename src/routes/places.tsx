@@ -6,13 +6,14 @@ import useRequest from '../hooks/useRequest';
 import Place from '../models/place';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { TrashIcon } from '@heroicons/react/20/solid';
 
 export default () => {
 
   const session = useSession();
   const navigate = useNavigate();
   const { data, mutate } = useGet('/places/');
-  const { post } = useRequest();
+  const { post, del } = useRequest();
 
   const [isCreatingPlace, setIsCreatingPlace] = useState(false);
   const [placeName, setPlaceName] = useState('');
@@ -29,6 +30,19 @@ export default () => {
       setIsCreatingPlace(false);
     } catch (e: any) {
       alert(e.message);
+    }
+  };
+
+  const deletePlace = async (placeId: number) => {
+    try {
+      const res = await del('/places/' + placeId);
+      if (!res.ok) {
+        alert((await res.json()).message);
+        return;
+      }
+      await mutate();
+    } catch (e: any) {
+      console.error(e.message);
     }
   };
 
@@ -58,9 +72,17 @@ export default () => {
           key={place.id}
         >
           <div
-            className="mb-4 flex h-32 w-full items-end
-             rounded-lg bg-primary/20 p-4"
+            className="relative mb-4 flex h-32 w-full
+             items-end rounded-lg bg-primary/20 p-4"
           >
+            <TrashIcon
+              className="absolute right-4 top-4 h-5 w-5
+              cursor-pointer text-primary"
+              onClick={async e => {
+                e.preventDefault();
+                await deletePlace(place.id);
+              }}
+            />
             <p>
               <span className="mr-4 text-5xl font-bold">{place.name}</span>
               共 {place.roomCount} 个房间

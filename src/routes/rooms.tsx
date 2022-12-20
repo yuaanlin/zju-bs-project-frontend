@@ -1,18 +1,20 @@
 import AutoAnimateDiv from '../components/AutoAnimateDiv';
 import { useSession } from '../hooks/useSession';
-import useGet from '../hooks/useGet';
+import useGet, { useRevalidate } from '../hooks/useGet';
 import Modal from '../components/Modal';
 import useRequest from '../hooks/useRequest';
 import Room from '../models/room';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useMemo, useState } from 'react';
+import { ChevronLeftIcon, TrashIcon } from '@heroicons/react/20/solid';
 
 export default () => {
   const session = useSession();
   const navigate = useNavigate();
   const params = useParams<{ placeId: string }>();
 
-  const { post } = useRequest();
+  const { post, del } = useRequest();
+  const revalidate = useRevalidate();
 
   const { placeId } = params;
 
@@ -50,12 +52,26 @@ export default () => {
     return undefined;
   }, [roomImage]);
 
+  const deleteRoom = async (roomId: number) => {
+    try {
+      const res = await del('/places/' + placeId + '/rooms/' + roomId);
+      if (!res.ok) {
+        alert((await res.json()).message);
+        return;
+      }
+      await refreshRooms();
+    } catch (e: any) {
+      console.error(e.message);
+    }
+  };
+
   return (
     <div className="mb-32">
 
       <div className="flex w-full justify-between">
-        <Link to="/places">
-          <p className="p-6 font-bold text-primary">返回场所列表</p>
+        <Link to="/places" className="flex items-center p-4">
+          <ChevronLeftIcon className="h-6 w-6 text-primary"/>
+          <p className="font-bold text-primary">返回场所列表</p>
         </Link>
         <p
           className="cursor-pointer p-6 font-bold text-primary"
@@ -82,9 +98,17 @@ export default () => {
           key={room.id}
         >
           <div
-            className="mb-4 flex h-32 w-full items-end
-             rounded-lg bg-primary/10 p-4"
+            className="relative mb-4 flex h-32 w-full
+             items-end rounded-lg bg-primary/10 p-4"
           >
+            <TrashIcon
+              className="absolute right-4 top-4 h-5 w-5
+              cursor-pointer text-primary"
+              onClick={async e => {
+                e.preventDefault();
+                await deleteRoom(room.id);
+              }}
+            />
             <p>
               <span className="mr-4 text-5xl font-bold">{room.name}</span>
               共 {room.deviceCount} 个设备
