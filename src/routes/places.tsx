@@ -18,14 +18,18 @@ export default () => {
   const [placeName, setPlaceName] = useState('');
 
   const submit = async () => {
-    const res = await post('/places/', { name: placeName });
-    const data = await res.json();
-    if (!res.ok) {
-      alert(data.message);
-      return;
+    try {
+      const res = await post('/places/', { name: placeName });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.message);
+        return;
+      }
+      await mutate();
+      setIsCreatingPlace(false);
+    } catch (e: any) {
+      alert(e.message);
     }
-    await mutate();
-    setIsCreatingPlace(false);
   };
 
   return (

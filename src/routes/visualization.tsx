@@ -54,18 +54,22 @@ export default () => {
   };
 
   const onDragEnd = async () => {
-    const { positionX, positionY } = devices.find(
-      device => device.id === draggingDeviceId)!;
-    const res = await put(
-      '/places/' + placeId + '/rooms/' + roomId + '/devices/' +
-      draggingDeviceId, { positionX, positionY });
-    const data = await res.json();
-    if (!res.ok) {
-      alert(data.message);
-      return;
+    try {
+      const { positionX, positionY } = devices.find(
+        device => device.id === draggingDeviceId)!;
+      const res = await put(
+        '/places/' + placeId + '/rooms/' + roomId + '/devices/' +
+        draggingDeviceId, { positionX, positionY });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.message);
+        return;
+      }
+      setDraggingDeviceId(undefined);
+      await refreshDevices();
+    } catch (e: any) {
+      alert(e.message);
     }
-    setDraggingDeviceId(undefined);
-    await refreshDevices();
   };
 
   return (

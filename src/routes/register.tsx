@@ -73,21 +73,28 @@ export default () => {
       return;
     }
 
-    const res = await post('/user/register', {
-      username: form.username,
-      password: form.password,
-      nickname: form.nickname,
-      phone: form.phone,
-      email: form.email
-    });
+    try {
 
-    const data = await res.json();
-    if (!res.ok) {
-      alert(data.message);
-      return;
+      const res = await post('/user/register', {
+        username: form.username,
+        password: form.password,
+        nickname: form.nickname,
+        phone: form.phone,
+        email: form.email
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.message);
+        return;
+      }
+      session.setToken(data.token);
+      navigate('/places');
+
+    } catch (e: any) {
+      alert(e.message);
     }
-    session.setToken(data.token);
-    navigate('/places');
+
   };
 
   return (

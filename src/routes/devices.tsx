@@ -28,19 +28,23 @@ export default () => {
   const devices = deviceData?.map((d: any) => parseDevice(d));
 
   const submit = async () => {
-    const res = await post(
-      '/places/' + placeId + '/rooms/' + roomId + '/devices/', {
-        name: deviceName,
-        type: deviceType
-      });
-    const data = await res.json();
-    if (!res.ok) {
-      alert(data.message);
-      return;
+    try {
+      const res = await post(
+        '/places/' + placeId + '/rooms/' + roomId + '/devices/', {
+          name: deviceName,
+          type: deviceType
+        });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.message);
+        return;
+      }
+      setIsCreatingDevice(false);
+      await refreshDevices();
+      await refreshRoom();
+    } catch (e: any) {
+      alert(e.message);
     }
-    setIsCreatingDevice(false);
-    await refreshDevices();
-    await refreshRoom();
   };
 
   return (

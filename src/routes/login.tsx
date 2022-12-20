@@ -14,14 +14,18 @@ export default () => {
   const [password, setPassword] = useState('');
 
   const submit = async () => {
-    const res = await post('/user/login', { username, password });
-    const data = await res.json();
-    if (!res.ok) {
-      alert(data.message);
-      return;
+    try {
+      const res = await post('/user/login', { username, password });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.message);
+        return;
+      }
+      session.setToken(data.token);
+      navigate('/places');
+    } catch (e: any) {
+      alert(e.message);
     }
-    session.setToken(data.token);
-    navigate('/places');
   };
 
   return (

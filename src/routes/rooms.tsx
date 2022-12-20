@@ -25,18 +25,22 @@ export default () => {
   const [roomImage, setRoomImage] = useState<File>();
 
   const submit = async () => {
-    const res = await post('/places/' + placeId + '/rooms/', {
-      name: roomName,
-      image: roomImage
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      alert(data.message);
-      return;
+    try {
+      const res = await post('/places/' + placeId + '/rooms/', {
+        name: roomName,
+        image: roomImage
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.message);
+        return;
+      }
+      await refreshRooms();
+      await refreshPlace();
+      setIsCreatingRoom(false);
+    } catch (e: any) {
+      alert(e.message);
     }
-    await refreshRooms();
-    await refreshPlace();
-    setIsCreatingRoom(false);
   };
 
   const roomImageObjectUrl = useMemo(() => {
